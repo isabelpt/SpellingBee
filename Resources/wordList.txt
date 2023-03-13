@@ -1,0 +1,17 @@
+a
+abcd
+acb
+ad
+adcb
+bacd
+bca
+bd
+bdca
+cabd
+cba
+cd
+cdba
+dabc
+dba
+dc
+dcba
