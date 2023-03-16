@@ -44,24 +44,33 @@ public class SpellingBee {
     //  Store them all in the ArrayList words. Do this by calling ANOTHER method
     //  that will find the substrings recursively.
     public void generate() {
-        // YOUR CODE HERE — Call your recursive method!
         generateWords("", letters);
-        for (String word : words) {
-            System.out.println(word);
-        }
     }
 
+    /**
+     * The generateWords method recursively creates every possible set of chars) from the letters given
+     * @param str1 originally empty, stores created word
+     * @param str2 original set of chars, chars removed as words made
+     * @return String to be able to recursively create words
+     */
     public String generateWords(String str1, String str2) {
+        // Base case: when second string is empty, so the largest word in that recursive segment has been created
         if (str2.length() == 0) {
             return str1;
         }
+        // Adds word from first string every time, to make sure every length and possible has been created
         if (!str1.isEmpty()) {
             words.add(str1);
         }
+        // For-loop to add each possible next character
         for (int i = 0; i < str2.length(); i++) {
+            // Adds a char to the end
             String sub1 = str1 + str2.charAt(i);
+            // Removes that char from the other string
             String sub2 = str2.substring(0, i) + str2.substring(i+1);
+            // Recursively calls method again
             String result = generateWords(sub1, sub2);
+            // As long as the word is not empty, add word to the list
             if (!result.isEmpty()) {
                 words.add(result);
             }
@@ -72,15 +81,23 @@ public class SpellingBee {
     // TODO: Apply mergesort to sort all words. Do this by calling ANOTHER method
     //  that will find the substrings recursively.
     public void sort() {
-        // YOUR CODE HERE
         words = mergeSort(words, 0, words.size());
     }
 
+    /**
+     * Combines two arraylists, while sorting them
+     * @param arr1 first array
+     * @param arr2 second array
+     * @return merged arraylist
+     */
     public ArrayList<String> merge (ArrayList<String> arr1, ArrayList<String> arr2) {
+        // Create new arraylist to merge into
         ArrayList<String> merged = new ArrayList<String>();
+        // Track indices of each arraylist
         int i = 0, j = 0;
-
+        // While indices valid for both arraylists
         while (i < arr1.size() && j < arr2.size()) {
+            // Add smaller element to the end of the merged list
             if (arr1.get(i).compareTo(arr2.get(j)) < 0) {
                 merged.add(i+j, arr1.get(i));
                 i++;
@@ -90,6 +107,8 @@ public class SpellingBee {
                 j++;
             }
         }
+        // Add the rest of the elements from the arraylist that still has elements
+        // Only one while loop will run
         while (i < arr1.size()) {
             merged.add(i+j, arr1.get(i));
             i++;
@@ -98,20 +117,32 @@ public class SpellingBee {
             merged.add(i+j, arr2.get(j));
             j++;
         }
+        // Return merged list
         return merged;
     }
 
+    /**
+     * Recursive algorithm to apply mergesort to the arraylist of generated words
+     * @param words arraylist of words recursively created
+     * @param low low index for portion being looked at
+     * @param high high index for portion being looked at
+     * @return sorted arraylist
+     */
     public ArrayList<String> mergeSort(ArrayList<String> words, int low, int high) {
+        // Base case: return arraylist of one item
         if (high - low <= 1) {
             ArrayList<String> newArr = new ArrayList<String>();
             newArr.add(words.get(low));
             return newArr;
         }
 
+        // Find midpoint of segment being looked at
         int med = (high + low) / 2;
+        // Recursively run mergesort on divided segments
         ArrayList<String> arr1 = mergeSort(words, low, med);
         ArrayList<String> arr2 = mergeSort(words, med + 1, high);
 
+        // Return merged arrays
         return merge(arr1, arr2);
     }
 
@@ -130,23 +161,46 @@ public class SpellingBee {
     // TODO: For each word in words, use binary search to see if it is in the dictionary.
     //  If it is not in the dictionary, remove it from words.
     public void checkWords() {
-        // YOUR CODE HERE
-        for (int i = 0; i < words.size(); i++)
-        {
-            if (!binarySearch(words.get(i), DICTIONARY_SIZE / 2)) {
+        int i = 0;
+        // For each word, run binary search to see if it is in the dictionary
+        while (i < words.size()) {
+            // If not in dictionary
+            if (!binarySearch(words.get(i), 0, DICTIONARY_SIZE)) {
+                // Remove word from arraylist
                 words.remove(i);
+            }
+            else {
+                i++;
             }
         }
     }
 
-    public boolean binarySearch(String word, int med) {
+    /**
+     * Recursively run binary search to see if word is in the dictionary
+     * @param word word from list of words created
+     * @param beg low index of segment being looked at
+     * @param end high index of segment being looked at
+     * @return true if word found in dictionary, false otherwise
+     */
+    public boolean binarySearch(String word, int beg, int end) {
+        // Find midpoint of segment
+        int med = (beg + end) / 2;
+        // Base case: if the word is the middle value or if only looking at one item
         if (word.equals(DICTIONARY[med])) {
             return true;
         }
-        if (med == 0) {
+        // Need +1 to cover if down to one element and it isn't equal to the word
+        if (beg + 1 >= end) {
             return false;
         }
-        return binarySearch(word, med / 2);
+
+        // If the word is before the med point, look to the left
+        if (word.compareTo(DICTIONARY[med]) < 0) {
+            return binarySearch(word, beg, med);
+        }
+        // Else, look to the right
+        return binarySearch(word, med, end);
+
     }
 
     // Prints all valid words to wordList.txt
