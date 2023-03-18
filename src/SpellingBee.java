@@ -132,7 +132,9 @@ public class SpellingBee {
         // Base case: return arraylist of one item
         if (high - low <= 1) {
             ArrayList<String> newArr = new ArrayList<String>();
-            newArr.add(words.get(low));
+            if (low >= 0 && low < words.size()) {
+                newArr.add(words.get(low));
+            }
             return newArr;
         }
 
@@ -165,13 +167,12 @@ public class SpellingBee {
         // For each word, run binary search to see if it is in the dictionary
         while (i < words.size()) {
             // If not in dictionary
-            if (!binarySearch(words.get(i), 0, DICTIONARY_SIZE)) {
+            if (!(binarySearch(words.get(i), 0, DICTIONARY_SIZE - 1))) {
                 // Remove word from arraylist
                 words.remove(i);
+                i--;
             }
-            else {
-                i++;
-            }
+            i++;
         }
     }
 
@@ -183,24 +184,26 @@ public class SpellingBee {
      * @return true if word found in dictionary, false otherwise
      */
     public boolean binarySearch(String word, int beg, int end) {
-        // Find midpoint of segment
-        int med = (beg + end) / 2;
-        // Base case: if the word is the middle value or if only looking at one item
-        if (word.equals(DICTIONARY[med])) {
-            return true;
-        }
-        // Need +1 to cover if down to one element and it isn't equal to the word
-        if (beg + 1 >= end) {
+        // Base case: return false if have recursed to looking at no items
+        if (beg > end) {
             return false;
         }
-
-        // If the word is before the med point, look to the left
-        if (word.compareTo(DICTIONARY[med]) < 0) {
-            return binarySearch(word, beg, med);
+        // Find midpoint of segment
+        int med = (end + beg) / 2;
+        // Return true if have found the word
+        if (DICTIONARY[med].equals(word)) {
+            return true;
         }
-        // Else, look to the right
-        return binarySearch(word, med, end);
-
+        // If the word is to the left, only look to left
+        else if (DICTIONARY[med].compareTo(word) > 0) {
+            end = med - 1;
+        }
+        // Else, look to right
+        else {
+            beg = med + 1;
+        }
+        // Recursive step: look at next segment
+        return binarySearch(word, beg, end);
     }
 
     // Prints all valid words to wordList.txt
