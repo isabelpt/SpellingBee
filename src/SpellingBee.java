@@ -130,7 +130,7 @@ public class SpellingBee {
      */
     public ArrayList<String> mergeSort(ArrayList<String> words, int low, int high) {
         // Base case: return arraylist of one item
-        if (high - low <= 1) {
+        if (high - low < 1) {
             ArrayList<String> newArr = new ArrayList<String>();
             if (low >= 0 && low < words.size()) {
                 newArr.add(words.get(low));
